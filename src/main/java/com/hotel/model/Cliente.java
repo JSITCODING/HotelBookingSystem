@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+// Classe que representa um cliente do hotel
 public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -14,6 +15,7 @@ public class Cliente implements Serializable {
     private LocalDateTime dataCadastro;
     private LocalDateTime ultimaAtualizacao;
 
+    // Otniel: Constructor for creating a new client
     public Cliente(String id, String nome, String email, String telefone) {
         this.id = id;
         this.nome = nome;
@@ -23,6 +25,7 @@ public class Cliente implements Serializable {
         this.ultimaAtualizacao = LocalDateTime.now();
     }
 
+    // Getters e setters
     public String getId() {
         return id;
     }
@@ -63,11 +66,13 @@ public class Cliente implements Serializable {
         return ultimaAtualizacao;
     }
 
+    // Otniel: Updates client data and records the update date
     public void atualizarDados(String email, String telefone) {
         validateInput(this.nome, email, telefone);
         this.ultimaAtualizacao = LocalDateTime.now();
     }
 
+    // Otniel: Validates client input data
     private void validateInput(String nome, String email, String telefone) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome não pode ser vazio");

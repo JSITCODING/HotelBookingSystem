@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+// Classe que representa uma reserva de quarto no hotel
 public class Reserva implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -17,6 +18,7 @@ public class Reserva implements Serializable {
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // Otniel: Enum that defines the possible states of a reservation
     public enum ReservaStatus {
         PENDING("Pendente"),
         CONFIRMED("Confirmada"),
@@ -35,6 +37,7 @@ public class Reserva implements Serializable {
         }
     }
 
+    // Otniel: Constructor for creating a new reservation
     public Reserva(String id, Cliente cliente, Quarto quarto, LocalDate checkIn, LocalDate checkOut, ReservaStatus status) {
         this.id = id;
         this.cliente = cliente;
@@ -46,6 +49,7 @@ public class Reserva implements Serializable {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // Getters e setters
     public String getId() {
         return id;
     }
@@ -90,6 +94,7 @@ public class Reserva implements Serializable {
         return status;
     }
 
+    // Otniel: Updates the reservation status and records the update date
     public void setStatus(ReservaStatus status) {
         this.status = status;
         this.updatedAt = LocalDateTime.now();
@@ -103,6 +108,7 @@ public class Reserva implements Serializable {
         return updatedAt;
     }
 
+    // Otniel: Checks if the reservation is active (not cancelled and not finished)
     public boolean isActive() {
         return status != ReservaStatus.CANCELLED && 
                status != ReservaStatus.CHECKED_OUT;

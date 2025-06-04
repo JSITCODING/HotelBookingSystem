@@ -13,6 +13,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+// Priscila: Diálogo de login para autenticação de usuários
 public class LoginDialog extends Dialog<Worker> {
     private final WorkerDAO workerDAO;
 
@@ -39,6 +40,7 @@ public class LoginDialog extends Dialog<Worker> {
 
         getDialogPane().setContent(grid);
 
+        // Converte o resultado do diálogo para um objeto Worker após autenticação
         setResultConverter(dialogButton -> {
             if (dialogButton == loginButtonType) {
                 return workerDAO.authenticate(username.getText(), password.getText()).orElse(null);
@@ -46,11 +48,11 @@ public class LoginDialog extends Dialog<Worker> {
             return null;
         });
 
-         // Enable/Disable login button depending on whether a username was entered.
+        // Priscila: Habilita/desabilita o botão de login baseado no nome de usuário
         Node loginButton = getDialogPane().lookupButton(loginButtonType);
         loginButton.setDisable(true);
 
-        // Do validation when the username text changes.
+        // Priscila: Valida o campo de usuário quando o texto muda
         username.textProperty().addListener((observable, oldValue, newValue) -> {
             loginButton.setDisable(newValue.trim().isEmpty());
         });

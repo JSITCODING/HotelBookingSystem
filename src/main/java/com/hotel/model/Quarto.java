@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+// Classe que representa um quarto do hotel
 public class Quarto implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -15,6 +16,7 @@ public class Quarto implements Serializable {
     private List<String> amenities;
     private String description;
 
+    // Enum that defines the available room types
     public enum TipoQuarto {
         STANDARD("Standard"),
         DELUXE("Deluxe"),
@@ -31,6 +33,7 @@ public class Quarto implements Serializable {
         }
     }
 
+    // Otniel: Constructor for creating a room with all information
     public Quarto(String numero, String tipo, double preco, boolean disponivel, List<String> amenities, String description) {
         this.numero = numero;
         this.tipo = tipo;
@@ -40,10 +43,12 @@ public class Quarto implements Serializable {
         this.description = description;
     }
 
+    // Otniel: Simplified constructor for creating a basic room
     public Quarto(String numero, String tipo, double preco, boolean disponivel) {
         this(numero, tipo, preco, disponivel, new ArrayList<>(), "");
     }
 
+    // Getters e setters
     public String getNumero() {
         return numero;
     }
@@ -64,6 +69,7 @@ public class Quarto implements Serializable {
         return preco;
     }
 
+    // Atualiza o preço do quarto, garantindo que não seja negativo
     public void setPreco(double preco) {
         if (preco < 0) {
             throw new IllegalArgumentException("Preço não pode ser negativo");

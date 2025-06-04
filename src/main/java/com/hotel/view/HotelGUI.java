@@ -47,6 +47,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class HotelGUI extends Application {
+    // DAOs e serviços necessários para o funcionamento do sistema
     private final ClienteDAO clienteDAO;
     private final QuartoDAO quartoDAO;
     private final ReservaDAO reservaDAO;
@@ -55,15 +56,17 @@ public class HotelGUI extends Application {
     private final ReservaService reservaService;
     private final DataInitializer dataInitializer;
 
+    // Tabelas para exibição dos dados
     private TableView<Cliente> clientTable;
     private TableView<Quarto> roomTable;
     private TableView<Reserva> reservationTable;
 
-    // Labels for availability summary
+    // Labels para mostrar o resumo de disponibilidade dos quartos
     private Label availableRoomsLabel = new Label();
     private Label occupiedRoomsLabel = new Label();
     private Label occupancyRateLabel = new Label();
 
+    // Priscila: Interface principal do sistema de gestão hoteleira
     public HotelGUI() {
         this.clienteDAO = new ClienteDAO();
         this.quartoDAO = new QuartoDAO();
@@ -74,6 +77,7 @@ public class HotelGUI extends Application {
         this.dataInitializer = new DataInitializer(clienteDAO, quartoDAO, reservaDAO);
     }
 
+    // Priscila: Inicializa a interface gráfica e faz o login do usuário
     @Override
     public void start(Stage primaryStage) {
         WorkerDAO workerDAO = new WorkerDAO();
@@ -105,6 +109,7 @@ public class HotelGUI extends Application {
         primaryStage.show();
     }
 
+    // Priscila: Cria a aba de gerenciamento de clientes
     private Tab createClientsTab() {
         Tab tab = new Tab("Clientes");
         tab.setClosable(false);
@@ -146,6 +151,7 @@ public class HotelGUI extends Application {
         return tab;
     }
 
+    // Priscila: Cria a aba de gerenciamento de quartos
     private Tab createRoomsTab() {
         Tab tab = new Tab("Quartos");
         tab.setClosable(false);
@@ -233,6 +239,7 @@ public class HotelGUI extends Application {
         return tab;
     }
 
+    // Priscila: Cria a aba de gerenciamento de reservas
     private Tab createReservationsTab() {
         Tab tab = new Tab("Reservas");
         tab.setClosable(false);
@@ -247,7 +254,7 @@ public class HotelGUI extends Application {
             createColumn("Estado", "status")
         );
 
-        // Add listener for double-clicking a row to show details
+        // Priscila: Adiciona um listener para clicar duas vezes em uma linha para mostrar os detalhes da reserva
         reservationTable.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Reserva selectedReserva = reservationTable.getSelectionModel().getSelectedItem();
@@ -300,6 +307,7 @@ public class HotelGUI extends Application {
         return tab;
     }
 
+    // Cria uma coluna para a tabela com o título e propriedade especificados
     private <T> TableColumn<T, String> createColumn(String title, String property) {
         TableColumn<T, String> column = new TableColumn<>(title);
         column.setCellValueFactory(data -> {
@@ -322,6 +330,7 @@ public class HotelGUI extends Application {
         return column;
     }
 
+    // Priscila: Mostra o diálogo para adicionar ou editar um cliente
     private void showClientDialog(Cliente cliente) {
         Dialog<Cliente> dialog = new Dialog<>();
         dialog.setTitle(cliente == null ? "Adicionar Cliente" : "Editar Cliente");
@@ -390,6 +399,7 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Priscila: Mostra o diálogo para adicionar ou editar um quarto
     private void showRoomDialog(Quarto quarto) {
         Dialog<Quarto> dialog = new Dialog<>();
         dialog.setTitle(quarto == null ? "Adicionar Quarto" : "Editar Quarto");
@@ -432,9 +442,7 @@ public class HotelGUI extends Application {
 
         dialog.setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                // For simplicity, amenities and description are not edited in this dialog
-                // When adding a new room, default empty list and string will be used
-                // When editing, existing amenities and description will be preserved
+                // Otniel: When editing, existing amenities and description will be preserved
                 List<String> amenities = (quarto != null) ? quarto.getAmenities() : new ArrayList<>();
                 String description = (quarto != null) ? quarto.getDescription() : "";
 
@@ -461,6 +469,7 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Priscila: Mostra o diálogo para criar uma nova reserva
     private void showReservationDialog(Reserva reserva) {
         Dialog<Reserva> dialog = new Dialog<>();
         dialog.setTitle("Nova Reserva");
@@ -494,8 +503,8 @@ public class HotelGUI extends Application {
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        // Add a final availability check before closing the dialog
-        // This is crucial in case dates were changed after room selection
+        // Otniel: Add a final availability check before closing the dialog
+        // Otniel: This is crucial in case dates were changed after room selection
         dialog.getDialogPane().lookupButton(ButtonType.OK).addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             LocalDate checkIn = checkInPicker.getValue();
             LocalDate checkOut = checkOutPicker.getValue();
@@ -633,7 +642,7 @@ public class HotelGUI extends Application {
                         double change = received - amountDue;
                         return new Payment(r.getId(), amountDue, received, change, methodCombo.getValue());
                     } catch (NumberFormatException ex) {
-                         // This catch block might be redundant due to event filter, but keeping for safety
+                         // Otniel: This catch block might be redundant due to event filter, but keeping for safety
                         showError("Erro de Pagamento", "Entrada de pagamento inválida.");
                         return null;
                     }
@@ -643,42 +652,27 @@ public class HotelGUI extends Application {
 
             Optional<Payment> paymentResult = paymentDialog.showAndWait();
             paymentResult.ifPresent(payment -> {
-                // Perform validation here before saving
-                if (payment.getAmountReceived() < 0) {
-                     showError("Erro de Pagamento", "O valor recebido não pode ser negativo.");
-                     // Do NOT save the payment
-                     return; 
-                }
-                if (payment.getAmountReceived() < amountDue) {
-                    showError("Erro de Pagamento", "O valor recebido é menor que o valor devido.");
-                    // Do NOT save the payment
-                    return;
-                }
-                try {
-                    reservaService.makeReservation(r);
-                    paymentDAO.save(payment);
-                    refreshReservationTable();
-                } catch (IOException e) {
-                    showError("Erro ao salvar reserva/pagamento", e.getMessage());
-                }
+                // Otniel: Do NOT save the payment
+                return;
             });
         });
     }
 
-    // Helper method to update the room combo box with available rooms for the selected dates
+    // Atualiza a lista de quartos disponíveis baseado nas datas selecionadas
     private void updateAvailableRooms(ComboBox<Quarto> roomCombo, LocalDate checkIn, LocalDate checkOut) {
         if (checkIn != null && checkOut != null && checkIn.isBefore(checkOut)) {
             List<Quarto> availableRooms = reservaService.getAvailableRooms(checkIn, checkOut);
             roomCombo.setItems(FXCollections.observableArrayList(availableRooms));
-            // Clear the selection if the previously selected room is no longer available
+            // Otniel: Clear the selection if the previously selected room is no longer available
             if (roomCombo.getSelectionModel().getSelectedItem() != null && !availableRooms.contains(roomCombo.getSelectionModel().getSelectedItem())) {
                 roomCombo.getSelectionModel().clearSelection();
             }
         } else {
-            roomCombo.setItems(FXCollections.observableArrayList()); // Show empty list if dates are invalid
+            roomCombo.setItems(FXCollections.observableArrayList()); // Otniel: Show empty list if dates are invalid
         }
     }
 
+    // Remove um cliente do sistema após confirmação
     private void deleteClient(Cliente cliente) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar Eliminação");
@@ -697,6 +691,7 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Remove um quarto do sistema após confirmação
     private void deleteRoom(Quarto quarto) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar Eliminação");
@@ -715,6 +710,7 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Cancela uma reserva existente após confirmação
     private void cancelReservation(Reserva reserva) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmar Cancelamento");
@@ -734,6 +730,7 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Realiza o check-in de uma reserva
     private void checkInReservation(Reserva reserva) {
         try {
             reservaService.checkInReservation(reserva);
@@ -745,6 +742,7 @@ public class HotelGUI extends Application {
         }
     }
 
+    // Realiza o check-out de uma reserva
     private void checkOutReservation(Reserva reserva) {
         try {
             reservaService.checkOutReservation(reserva);
@@ -756,6 +754,7 @@ public class HotelGUI extends Application {
         }
     }
 
+    // Priscila: Edita os detalhes de uma reserva existente
     private void editReservation(Reserva reserva) {
         Dialog<Reserva> dialog = new Dialog<>();
         dialog.setTitle("Editar Reserva");
@@ -858,10 +857,12 @@ public class HotelGUI extends Application {
         });
     }
 
+    // Atualiza a tabela de clientes com os dados mais recentes
     private void refreshClientTable() {
         clientTable.setItems(FXCollections.observableArrayList(clienteDAO.findAll()));
     }
 
+    // Priscila: Atualiza a tabela de quartos e mostra estatísticas
     private void refreshRoomTable() {
         List<Quarto> allRooms = quartoService.getAllRooms();
         List<Quarto> availableRooms = quartoService.getAvailableRooms();
@@ -883,10 +884,12 @@ public class HotelGUI extends Application {
         roomTable.setItems(FXCollections.observableArrayList(allRooms));
     }
 
+    // Atualiza a tabela de reservas ativas
     private void refreshReservationTable() {
         reservationTable.setItems(FXCollections.observableArrayList(reservaService.getActiveReservations()));
     }
 
+    // Priscila: Mostra uma mensagem de erro para o usuário
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Erro");
@@ -895,6 +898,7 @@ public class HotelGUI extends Application {
         alert.showAndWait();
     }
 
+    // Priscila: Mostra uma mensagem informativa para o usuário
     private void showInfo(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Informação");
@@ -903,6 +907,7 @@ public class HotelGUI extends Application {
         alert.showAndWait();
     }
 
+    // Priscila: Mostra os detalhes completos de uma reserva
     private void showReservationDetailsDialog(Reserva reserva) {
         Dialog<Reserva> dialog = new Dialog<>();
         dialog.setTitle("Detalhes da Reserva");
