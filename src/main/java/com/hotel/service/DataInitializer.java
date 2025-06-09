@@ -71,7 +71,7 @@ public class DataInitializer {
         for (int i = 0; i < 50; i++) {
             String id = UUID.randomUUID().toString().substring(0, 8);
             String nome = angolanNames[random.nextInt(angolanNames.length)];
-            String email = nome.toLowerCase().replace(" ", ".") + i + "@example.com";
+            String email = nome.toLowerCase().replace(" ", ".") + i + "@gmail.com";
             String telefone = generateAngolanPhoneNumber();
             clientes.add(new Cliente(id, nome, email, telefone));
         }
@@ -84,7 +84,7 @@ public class DataInitializer {
         int prefix = random.nextInt(3);
         int middle = random.nextInt(900) + 100;
         int suffix = random.nextInt(1000);
-        return String.format("+244 9%d %d %03d", prefix + 1, middle, suffix);
+        return String.format("+244 923 %03d %03d", middle, suffix);
     }
 
     private void initializeQuartos() throws IOException {

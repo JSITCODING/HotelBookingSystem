@@ -653,7 +653,7 @@ public class HotelGUI extends Application {
             Optional<Payment> paymentResult = paymentDialog.showAndWait();
             paymentResult.ifPresent(payment -> {
                 // Otniel: Do NOT save the payment
-                return;
+                     return; 
             });
         });
     }

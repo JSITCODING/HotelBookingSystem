@@ -1,6 +1,7 @@
 package com.hotel;
 
 import com.hotel.view.HotelGUI;
+
 import javafx.application.Application;
 
 public class Main {
